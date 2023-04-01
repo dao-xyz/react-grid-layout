@@ -1,16 +1,16 @@
 import React from "react";
 import _ from "lodash";
-import RGL, { WidthProvider } from "react-grid-layout";
+import  { WidthProvider, Responsive } from "react-grid-layout";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export default class AllowOverlap extends React.PureComponent {
   static defaultProps = {
     className: "layout",
-    items: 20,
+    items: 2,
     rowHeight: 30,
-    onLayoutChange: function() {},
-    cols: 12
+    onLayoutChange: function() { console.log('??? ')},
+    cols: { xxs: 4, xs: 4, lg: 4, sm: 4 },
   };
 
   constructor(props) {
@@ -32,6 +32,7 @@ export default class AllowOverlap extends React.PureComponent {
 
   generateLayout() {
     const p = this.props;
+    console.log(p)
     return _.map(new Array(p.items), function(item, i) {
       const y = _.result(p, "y") || Math.ceil(Math.random() * 4) + 1;
       return {
@@ -50,15 +51,15 @@ export default class AllowOverlap extends React.PureComponent {
 
   render() {
     return (
-      <ReactGridLayout
+      <ResponsiveReactGridLayout
         layout={this.state.layout}
-        onLayoutChange={this.onLayoutChange}
+        onLayoutChange={() => { console.log('XXXX change! ')}}
         useCSSTransforms={true}
         allowOverlap={true}
         {...this.props}
       >
         {this.generateDOM()}
-      </ReactGridLayout>
+      </ResponsiveReactGridLayout>
     );
   }
 }

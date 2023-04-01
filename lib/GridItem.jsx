@@ -87,7 +87,7 @@ type Props = {
 
   onDrag?: GridItemCallback<GridDragEvent>,
   onDragStart?: GridItemCallback<GridDragEvent>,
-  onDragStop?: GridItemCallback<GridDragEvent>,
+  onDragStop?: GridItemCallback<GridDragEvent> & {xStart: number, yStart: number},
   onResize?: GridItemCallback<GridResizeEvent>,
   onResizeStart?: GridItemCallback<GridResizeEvent>,
   onResizeStop?: GridItemCallback<GridResizeEvent>
@@ -442,7 +442,6 @@ export default class GridItem extends React.Component<Props, State> {
     const pTop = parentRect.top / transformScale;
     newPosition.left = cLeft - pLeft + offsetParent.scrollLeft;
     newPosition.top = cTop - pTop + offsetParent.scrollTop;
-    this.setState({ dragging: newPosition });
 
     // Call callback with this data
     const { x, y } = calcXY(
@@ -452,6 +451,9 @@ export default class GridItem extends React.Component<Props, State> {
       this.props.w,
       this.props.h
     );
+
+    this.setState({ dragging: newPosition, dragStartXY: {x,y} });
+
 
     return onDragStart.call(this, this.props.i, x, y, {
       e,
@@ -524,12 +526,13 @@ export default class GridItem extends React.Component<Props, State> {
     }
     const { w, h, i } = this.props;
     const { left, top } = this.state.dragging;
+    const {x: xStart, y: yStart} = this.state.dragStartXY;
+  
     const newPosition: PartialPosition = { top, left };
-    this.setState({ dragging: null });
+    this.setState({ dragging: null,dragStartXY: null });
 
     const { x, y } = calcXY(this.getPositionParams(), top, left, w, h);
-
-    return onDragStop.call(this, i, x, y, {
+    return onDragStop.call(this, i, x, y, xStart, yStart, {
       e,
       node,
       newPosition

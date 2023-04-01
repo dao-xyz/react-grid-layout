@@ -273,9 +273,9 @@ export default class ReactGridLayout extends React.Component<Props, State> {
     { e, node }
   ) => {
     const { oldDragItem } = this.state;
-    let { layout } = this.state;
+    let { layout: layoutPrev} = this.state;
     const { cols, allowOverlap, preventCollision } = this.props;
-    const l = getLayoutItem(layout, i);
+    const l = getLayoutItem(layoutPrev, i);
     if (!l) return;
 
     // Create placeholder (display only)
@@ -290,8 +290,9 @@ export default class ReactGridLayout extends React.Component<Props, State> {
 
     // Move the element to the dragged location.
     const isUserAction = true;
-    layout = moveElement(
-      layout,
+
+    const layout = moveElement(
+      layoutPrev,
       l,
       x,
       y,
@@ -320,24 +321,28 @@ export default class ReactGridLayout extends React.Component<Props, State> {
    * @param {Event} e The mousedown event
    * @param {Element} node The current dragging DOM element
    */
-  onDragStop: (i: string, x: number, y: number, GridDragEvent) => void = (
+  onDragStop: (i: string, x: number, y: number, xStart: number, xEnd: number, GridDragEvent) => void = (
     i,
     x,
     y,
+    xStart,
+    yStart,
     { e, node }
   ) => {
+    console.log('here!')
     if (!this.state.activeDrag) return;
 
     const { oldDragItem } = this.state;
-    let { layout } = this.state;
+    let { layout: layoutPrev } = this.state;
     const { cols, preventCollision, allowOverlap } = this.props;
-    const l = getLayoutItem(layout, i);
+    const l = getLayoutItem(layoutPrev, i);
     if (!l) return;
 
+    let startX = l.x;
     // Move the element here
     const isUserAction = true;
-    layout = moveElement(
-      layout,
+    let layout = moveElement(
+      layoutPrev,
       l,
       x,
       y,
@@ -350,6 +355,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
 
     this.props.onDragStop(layout, oldDragItem, l, null, e, node);
 
+    console.log('drag stop', layoutPrev, layout, changed,x,startX)
     // Set state
     const newLayout = allowOverlap
       ? layout
@@ -362,13 +368,17 @@ export default class ReactGridLayout extends React.Component<Props, State> {
       oldLayout: null
     });
 
-    this.onLayoutMaybeChanged(newLayout, oldLayout);
+    console.log('drag stop',x,y,xStart,yStart);
+    if(xStart !== x || yStart !== y)
+    {
+      console.log('layout change!')
+      this.props.onLayoutChange(newLayout);
+    }
   };
 
-  onLayoutMaybeChanged(newLayout: Layout, oldLayout: ?Layout) {
+  onLayoutMaybeChanged(newLayout: Layout, oldLayout: ?Layout, changed?: boolean) {
     if (!oldLayout) oldLayout = this.state.layout;
-
-    if (!deepEqual(oldLayout, newLayout)) {
+    if (changed || !deepEqual(oldLayout, newLayout)) {
       this.props.onLayoutChange(newLayout);
     }
   }
