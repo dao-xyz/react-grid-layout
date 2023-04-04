@@ -22,6 +22,7 @@ import BootstrapStyleLayout from './pages/17-responsive-bootstrap-style';
 import ResizableHandles from './pages/16-resizable-handles';
 import ScaledLayout from './pages/18-scale';
 import AllowOverlap from './pages/19-allow-overlap';
+import PreserveAspectRatio from './pages/20-aspect-ratio';
 interface Examle {
 	t: string,
 	c: ComponentType<any>
@@ -107,6 +108,10 @@ let array: Examle[] = [
 	{
 		t: '19-allow-overlap',
 		c: AllowOverlap
+	},
+	{
+		t: '20-preserve-aspect-ratio',
+		c: PreserveAspectRatio
 	}
 ]
 
